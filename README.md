@@ -26,3 +26,14 @@ Start local development server
 ```shell script
 make dev
 ```
+
+# Tests
+
+```shell script
+# Running unit tests
+make tests
+
+# Running integration tests
+docker-compose -f docker-compose.integration.yml up # This fires up integration postgres instance
+make integration_tests
+```

@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"go-sample-rest/internal/openmateo"
-	"go-sample-rest/internal/types"
 	"io"
 	"net/http"
 	"testing"
+
+	"go-sample-rest/internal/openmateo"
+	"go-sample-rest/internal/types"
 
 	"github.com/stretchr/testify/require"
 )
@@ -115,6 +116,7 @@ func TestGetLatestWeatherData(t *testing.T) {
 			if tc.shouldError {
 				require.Error(t, err)
 			} else {
+				require.NoError(t, err)
 				require.Equal(t, tc.expectedResponse, weatherData)
 			}
 		})
