@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  flyway:
+    image: flyway/flyway
+    command: -url=jdbc:postgresql://postgres:5432/weather -schemas=weather -createSchemas=true -user=weather -password=weather -connectRetries=60 migrate
+    volumes:
+      - ./migrations:/flyway/sql
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    environment:
+      - 'POSTGRES_PASSWORD=weather'
+      - 'POSTGRES_USER=weather'
+    ports:
+      - '6432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
