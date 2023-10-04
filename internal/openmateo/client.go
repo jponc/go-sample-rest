@@ -10,11 +10,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Client struct {
-	httpClient *http.Client
+type HTTPClient interface {
+	Get(url string) (resp *http.Response, err error)
 }
 
-func NewClient(httpClient *http.Client) *Client {
+type Client struct {
+	httpClient HTTPClient
+}
+
+func NewClient(httpClient HTTPClient) *Client {
 	return &Client{
 		httpClient: httpClient,
 	}
