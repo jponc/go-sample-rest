@@ -45,4 +45,8 @@ brew install minikube
 
 # Builds the image and deploys it to minikube
 make start_minikube
+
+# Wait for a couple of seconds for the postgres instance, flyway migration and service to fire up
+# then portforward weather-service to localhost 8080
+kubectl port-forward --context minikube --namespace go-sample-rest service/weather-service 8080:80
 ```
