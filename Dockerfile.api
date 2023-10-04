@@ -1,0 +1,19 @@
+FROM golang:1.21-alpine AS build
+
+WORKDIR /app
+
+COPY go.mod ./
+COPY go.sum ./
+
+RUN go mod download
+
+COPY . .
+
+# We can utilise docker buildx in CI
+RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o app cmd/api/*.go
+
+FROM alpine AS final
+LABEL maintainer="ponce.julianalfonso@gmail.com"
+COPY --from=build /app/app /app
+
+CMD [ "/app" ]

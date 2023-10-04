@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: go-sample-rest
+---
+
+# weather-service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: weather-service
+  name: weather-service
+  namespace: go-sample-rest
+spec:
+  selector:
+    matchLabels:
+      app: weather-service
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: weather-service
+    spec:
+      initContainers:
+      - name: flyway
+        image: go-sample-rest/flyway
+        imagePullPolicy: Never
+        command: ["flyway", "migrate"]
+        args: ["-url=jdbc:postgresql://postgres:5432/weather", "-schemas=weather", "-createSchemas=true", "-user=weather", "-password=weather", "-connectRetries=60"]
+      containers:
+      - name: weather-service
+        image: go-sample-rest/weather-service
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 8080
+        env:
+          - name: PORT
+            value: "8080"
+          - name: PG_DB_CONN_STRING
+            value: "postgres://weather:weather@postgres:5432/weather?sslmode=disable"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: weather-service
+  name: weather-service
+  namespace: go-sample-rest
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: weather-service
+  type: ClusterIP
+---
+
+# postgres
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: postgres
+  name: postgres
+  namespace: go-sample-rest
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15
+        ports:
+          - containerPort: 5432
+        env:
+          - name: POSTGRES_PASSWORD
+            value: "weather"
+          - name: POSTGRES_USER
+            value: "weather"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: postgres
+  name: postgres
+  namespace: go-sample-rest
+spec:
+  ports:
+  - port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    app: postgres
+  type: ClusterIP
+---

@@ -30,7 +30,12 @@ func NewServer(port int, weatherService WeatherService) *Server {
 
 func (s *Server) Start() {
 	r := chi.NewRouter()
+
+	// Middlewares
 	r.Use(middleware.Logger)
+	r.Use(middleware.RequestID)
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Recoverer)
 
 	r.Route("/weather", func(r chi.Router) {
 		r.Get("/{lat},{long}/latest", s.weatherService.GetLatestWeather)

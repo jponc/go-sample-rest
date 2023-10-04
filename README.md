@@ -37,3 +37,12 @@ make tests
 docker-compose -f docker-compose.integration.yml up # This fires up integration postgres instance
 make integration_tests
 ```
+
+# Building and deployment
+```shell script
+# Install minikube
+brew install minikube
+
+# Builds the image and deploys it to minikube
+make start_minikube
+```
